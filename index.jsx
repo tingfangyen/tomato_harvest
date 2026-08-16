@@ -34,7 +34,7 @@ const raw = [
   { day: "8/3", red: { weights: [12.7], unweighed: 0 }, yellow: { weights: [25.7], unweighed: 0 } },
   { day: "8/6", red: { weights: [16.5, 13.2, 8.5, 8.7, 6.3], unweighed: 0 }, yellow: { weights: [15.4, 13.7, 13.3, 11.0, 29.3, 21.9], unweighed: 1, note: "1 half-eaten by squirrel" } },
   { day: "8/12", red: { weights: [14.3], unweighed: 2, note: "rotted" }, yellow: { weights: [20.9, 18.15, 17.55, 17.05, 14.9, 13, 11.7], unweighed: 0 }},
-  { day: "8/16", red: { weights: [17.8, 16], unweighed: 0 }, yellow: { weights: [21.15, 13.10, 13.90, 13.15, 8.10, 8.15, 8.15, 3.15], unweighed: 2, note: "rotted" }},
+  { day: "8/16", red: { weights: [17.8, 16], unweighed: 0 }, yellow: { weights: [21.15, 13.10, 13.90, 13.15, 8.10, 8.15, 8.15, 3.15, 13.45], unweighed: 2, note: "rotted" }},
 ];
 
 const fmtLbOz = (oz) => {
