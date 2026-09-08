@@ -40,6 +40,8 @@ const raw = [
   { day: "8/23", red: { weights: [], unweighed: 0 }, yellow: { weights: [15.7], unweighed: 0 }},
   { day: "8/27", red: { weights: [15.55], unweighed: 0 }, yellow: {weights: [], unweighed: 0 }},
   { day: "8/30", red: { weights: [], unweighed: 0 }, yellow: { weights: [18.9, 17.55, 11.85, 12.3], unweighed: 0 }}, 
+  { day: "9/4", red: { weights: [], unweighed: 0 }, yellow: { weights: [16.65], unweighed: 0 } },
+  { day: "9/6", red: { weights: [10.25, 9.10], unweighed: 0 }, yellow: { weights: [10.55], unweighed: 0 } },
 ];
 
 const fmtLbOz = (oz) => {
