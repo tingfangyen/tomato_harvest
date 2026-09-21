@@ -22,7 +22,7 @@ const COLORS = {
 };
 
 // ---------- Raw data ----------
-// Same 9 picking days for both varieties. Edit this array as new harvests come in.
+// Edit this array as new harvests come in.
 const raw = [
   { day: "≤ 7/24", red: { weights: [23.6, 19.9, 14.8, 8.9, 8.3, 8.4, 7.8, 3.6, 2.0], unweighed: 0 }, yellow: { weights: [33.2, 11.1], unweighed: 0 } },
   { day: "7/25", red: { weights: [21.9, 17.7, 20.4], unweighed: 0 }, yellow: { weights: [26.9, 8.7], unweighed: 0 } },
@@ -45,6 +45,7 @@ const raw = [
   { day: "9/12", red: { weights: [11.25], unweighed: 0}, yellow: {weights: [16.15], unweighed: 0 } },
   { day: "9/16", red: { weights: [20.45, 13.4, 12.9, 12.95, 10.65], unweighed: 0}, yellow: {weights: [], unweighed: 0}},
   { day: "9/19", red: { weights: [15, 14.05, 11.3, 10.7, 10.7, 9.9, 8.95, 6.25], unweighed: 0}, yellow: { weights: [12.4, 8.3], unweighed: 0}}, 
+  { day: "9/20", red: { weights: [13.25, 13.05, 11.1, 11.15, 9.75, 9.8, 7.7, 6.85, 7.25, 5.8, 5.5], unweighed: 0}, yellow: { weights: [], unweighed: 0}},
 ];
 
 const fmtLbOz = (oz) => {
