@@ -223,7 +223,7 @@ function TomatoHarvest() {
     }}>
       <div style={{ textAlign: "center", marginBottom: 22 }}>
         <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, letterSpacing: 3, color: COLORS.yellowBright, textTransform: "uppercase" }}>
-          Garden Log · Season Record
+          Garden Log · 2026 Season Record
         </div>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 34, margin: "6px 0 4px", color: COLORS.paper }}>
           The Tomato Harvest
