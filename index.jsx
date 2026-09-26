@@ -23,24 +23,35 @@ const COLORS = {
 
 // Helper: Transforms flat harvest entries into grouped daily chart data
 function formatRawData(flatLog, filterYear = 2026, filterCrop = "tomato") {
-  const filtered = flatLog.filter(item => item.year === filterYear && item.crop === filterCrop);
-  
+  // Sort entries chronologically by YYYY-MM-DD date
+  const sorted = [...flatLog].sort((a, b) => a.date.localeCompare(b.date));
+
   const dayMap = new Map();
 
-  filtered.forEach(item => {
-    if (!dayMap.has(item.day)) {
-      dayMap.set(item.day, {
-        day: item.day,
+  sorted.forEach((item) => {
+    // Extract year directly from "YYYY-MM-DD"
+    const [yearStr, monthStr, dayStr] = item.date.split('-');
+    const itemYear = parseInt(yearStr, 10);
+
+    if (itemYear !== filterYear || item.crop !== filterCrop) return;
+
+    // Convert "2026-07-24" -> "7/24" display format
+    const displayDay = `${parseInt(monthStr, 10)}/${parseInt(dayStr, 10)}`;
+
+    if (!dayMap.has(displayDay)) {
+      dayMap.set(displayDay, {
+        day: displayDay,
+        date: item.date,
         red: { weights: [], unweighed: 0, note: null },
         yellow: { weights: [], unweighed: 0, note: null }
       });
     }
 
-    const dayObj = dayMap.get(item.day);
-    if (dayObj[item.variety]) {
-      dayObj[item.variety].weights.push(...item.weightsOz);
-      dayObj[item.variety].unweighed += item.unweighed || 0;
-      if (item.note) dayObj[item.variety].note = item.note;
+    const dayEntry = dayMap.get(displayDay);
+    if (dayEntry[item.variety]) {
+      dayEntry[item.variety].weights.push(...item.weightsOz);
+      dayEntry[item.variety].unweighed += item.unweighed || 0;
+      if (item.note) dayEntry[item.variety].note = item.note;
     }
   });
 

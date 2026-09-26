@@ -1,369 +1,328 @@
 [
   {
-    "year": 2026,
+    "date": "2026-07-24",
     "crop": "tomato",
     "variety": "red",
-    "day": "≤ 7/24",
     "weightsOz": [23.6, 19.9, 14.8, 8.9, 8.3, 8.4, 7.8, 3.6, 2.0],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-07-24",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "≤ 7/24",
     "weightsOz": [33.2, 11.1],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-07-25",
     "crop": "tomato",
     "variety": "red",
-    "day": "7/25",
     "weightsOz": [21.9, 17.7, 20.4],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-07-25",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "7/25",
     "weightsOz": [26.9, 8.7],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-07-26",
     "crop": "tomato",
     "variety": "red",
-    "day": "7/26",
     "weightsOz": [18.9, 20.3, 14.5, 7.3],
     "unweighed": 1,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-07-26",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "7/26",
     "weightsOz": [24.6],
     "unweighed": 1,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-07-27",
     "crop": "tomato",
     "variety": "red",
-    "day": "7/27",
     "weightsOz": [28.5, 17.5, 24.9, 18.1, 18.2, 23.0, 22.6, 19.8, 17.8, 14.0, 10.2],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-07-27",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "7/27",
     "weightsOz": [8.7],
     "unweighed": 1,
     "note": "squirrel-eaten"
   },
   {
-    "year": 2026,
+    "date": "2026-07-29",
     "crop": "tomato",
     "variety": "red",
-    "day": "7/29",
     "weightsOz": [18.6, 16.3, 22.7, 15.3, 16.0],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-07-29",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "7/29",
     "weightsOz": [20.8, 11.7, 11.4],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-07-31",
     "crop": "tomato",
     "variety": "red",
-    "day": "7/31",
     "weightsOz": [27.1, 25.5, 18.0, 17.6, 14.6, 14.5, 11.5, 10.8, 6.2],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-07-31",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "7/31",
     "weightsOz": [18.5, 16.5],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-08-02",
     "crop": "tomato",
     "variety": "red",
-    "day": "8/2",
     "weightsOz": [20.3, 24.4, 17.5, 16.1, 12.5],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-08-02",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "8/2",
     "weightsOz": [26.6, 26.8, 17.9],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-08-03",
     "crop": "tomato",
     "variety": "red",
-    "day": "8/3",
     "weightsOz": [12.7],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-08-03",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "8/3",
     "weightsOz": [25.7],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-08-06",
     "crop": "tomato",
     "variety": "red",
-    "day": "8/6",
     "weightsOz": [16.5, 13.2, 8.5, 8.7, 6.3],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-08-06",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "8/6",
     "weightsOz": [15.4, 13.7, 13.3, 11.0, 29.3, 21.9],
     "unweighed": 1,
     "note": "1 half-eaten by squirrel"
   },
   {
-    "year": 2026,
+    "date": "2026-08-12",
     "crop": "tomato",
     "variety": "red",
-    "day": "8/12",
     "weightsOz": [14.3],
     "unweighed": 2,
     "note": "rotted"
   },
   {
-    "year": 2026,
+    "date": "2026-08-12",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "8/12",
     "weightsOz": [20.9, 18.15, 17.55, 17.05, 14.9, 13.0, 11.7],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-08-16",
     "crop": "tomato",
     "variety": "red",
-    "day": "8/16",
     "weightsOz": [17.8, 16.0],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-08-16",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "8/16",
     "weightsOz": [21.15, 13.1, 13.9, 13.15, 8.1, 8.15, 8.15, 3.15, 13.45],
     "unweighed": 2,
     "note": "rotted"
   },
   {
-    "year": 2026,
+    "date": "2026-08-18",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "8/18",
     "weightsOz": [17.95],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-08-21",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "8/21",
     "weightsOz": [13.35, 10.5],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-08-23",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "8/23",
     "weightsOz": [15.7],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-08-27",
     "crop": "tomato",
     "variety": "red",
-    "day": "8/27",
     "weightsOz": [15.55],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-08-30",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "8/30",
     "weightsOz": [18.9, 17.55, 11.85, 12.3],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-04",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "9/4",
     "weightsOz": [16.65],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-06",
     "crop": "tomato",
     "variety": "red",
-    "day": "9/6",
     "weightsOz": [10.25, 9.1],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-06",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "9/6",
     "weightsOz": [10.55],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-12",
     "crop": "tomato",
     "variety": "red",
-    "day": "9/12",
     "weightsOz": [11.25],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-12",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "9/12",
     "weightsOz": [16.15],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-16",
     "crop": "tomato",
     "variety": "red",
-    "day": "9/16",
     "weightsOz": [20.45, 13.4, 12.9, 12.95, 10.65],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-19",
     "crop": "tomato",
     "variety": "red",
-    "day": "9/19",
     "weightsOz": [15.0, 14.05, 11.3, 10.7, 10.7, 9.9, 8.95, 6.25],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-19",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "9/19",
     "weightsOz": [12.4, 8.3],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-20",
     "crop": "tomato",
     "variety": "red",
-    "day": "9/20",
     "weightsOz": [13.25, 13.05, 11.1, 11.15, 9.75, 9.8, 7.7, 6.85, 7.25, 5.8, 5.5],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-21",
     "crop": "tomato",
     "variety": "red",
-    "day": "9/21",
     "weightsOz": [10.6, 9.95],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-21",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "9/21",
     "weightsOz": [14.4, 13.35],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-23",
     "crop": "tomato",
     "variety": "red",
-    "day": "9/23",
     "weightsOz": [11.15],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-25",
     "crop": "tomato",
     "variety": "red",
-    "day": "9/25",
     "weightsOz": [10.7, 8.95, 8.9, 9.05, 7.85, 13.6],
     "unweighed": 0,
     "note": null
   },
   {
-    "year": 2026,
+    "date": "2026-09-25",
     "crop": "tomato",
     "variety": "yellow",
-    "day": "9/25",
     "weightsOz": [18.15, 14.05, 13.3, 9.45],
     "unweighed": 0,
     "note": null
