@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import {
@@ -51,6 +50,9 @@ const raw = [
   { day: "9/25", red: { weights: [10.7, 8.95, 8.9, 9.05, 7.85, 13.6], unweighed: 0}, yellow: {weights: [18.15, 14.05, 13.3, 9.45], unweighed: 0}},
 ];
 
+// Unit constants
+const OZ_TO_GRAMS = 28.3495;
+
 const fmtLbOz = (oz) => {
   const lb = Math.floor(oz / 16);
   const rem = Math.round((oz - lb * 16) * 10) / 10;
@@ -58,10 +60,28 @@ const fmtLbOz = (oz) => {
   return `${lb} lb ${rem} oz`;
 };
 
+const fmtGrams = (oz) => {
+  const grams = Math.round(oz * OZ_TO_GRAMS);
+  return `${grams} g`;
+};
+
+const fmtWeight = (oz, unit) => {
+  return unit === 'metric' ? fmtGrams(oz) : fmtLbOz(oz);
+};
+
+const fmtLbOrKg = (oz, unit) => {
+  if (unit === 'metric') {
+    const kg = (oz * OZ_TO_GRAMS) / 1000;
+    return `${Math.round(kg * 100) / 100} kg`;
+  }
+  const lb = oz / 16;
+  return `${Math.round(lb * 100) / 100} lb`;
+};
+
 const sum = (arr) => arr.reduce((a, b) => a + b, 0);
 
 // ---------- Derived datasets ----------
-function useDerived() {
+function useDerived(unit) {
   return useMemo(() => {
     let runRed = 0, runYellow = 0;
     const daily = raw.map((d) => {
@@ -69,26 +89,65 @@ function useDerived() {
       const yellowTotal = sum(d.yellow.weights);
       runRed += redTotal;
       runYellow += yellowTotal;
+      
+      const redVal = unit === 'metric' 
+        ? Math.round(((redTotal * OZ_TO_GRAMS) / 1000) * 100) / 100
+        : Math.round((redTotal / 16) * 100) / 100;
+
+      const yellowVal = unit === 'metric'
+        ? Math.round(((yellowTotal * OZ_TO_GRAMS) / 1000) * 100) / 100
+        : Math.round((yellowTotal / 16) * 100) / 100;
+
+      const totalVal = unit === 'metric'
+        ? Math.round((((redTotal + yellowTotal) * OZ_TO_GRAMS) / 1000) * 100) / 100
+        : Math.round(((redTotal + yellowTotal) / 16) * 100) / 100;
+
+      const cumRedVal = unit === 'metric'
+        ? Math.round(((runRed * OZ_TO_GRAMS) / 1000) * 100) / 100
+        : Math.round((runRed / 16) * 100) / 100;
+
+      const cumYellowVal = unit === 'metric'
+        ? Math.round(((runYellow * OZ_TO_GRAMS) / 1000) * 100) / 100
+        : Math.round((runYellow / 16) * 100) / 100;
+
+      const cumTotalVal = unit === 'metric'
+        ? Math.round((((runRed + runYellow) * OZ_TO_GRAMS) / 1000) * 100) / 100
+        : Math.round(((runRed + runYellow) / 16) * 100) / 100;
+
       return {
         day: d.day,
         redOz: Math.round(redTotal * 10) / 10,
         yellowOz: Math.round(yellowTotal * 10) / 10,
-        redLb: Math.round((redTotal / 16) * 100) / 100,
-        yellowLb: Math.round((yellowTotal / 16) * 100) / 100,
+        redVal,
+        yellowVal,
         totalOz: redTotal + yellowTotal,
-        totalLb: Math.round(((redTotal + yellowTotal) / 16) * 100) / 100,
+        totalVal,
         redCount: d.red.weights.length + d.red.unweighed,
         yellowCount: d.yellow.weights.length + d.yellow.unweighed,
-        cumulativeRedLb: Math.round((runRed / 16) * 100) / 100,
-        cumulativeYellowLb: Math.round((runYellow / 16) * 100) / 100,
-        cumulativeTotalLb: Math.round(((runRed + runYellow) / 16) * 100) / 100,
+        cumRedVal,
+        cumYellowVal,
+        cumTotalVal,
       };
     });
 
     const individual = [];
     raw.forEach((d, dayIdx) => {
-      d.red.weights.forEach((w) => individual.push({ day: d.day, dayIdx, weightOz: w, variety: "red", label: fmtLbOz(w) }));
-      d.yellow.weights.forEach((w) => individual.push({ day: d.day, dayIdx, weightOz: w, variety: "yellow", label: fmtLbOz(w) }));
+      d.red.weights.forEach((w) => individual.push({
+        day: d.day,
+        dayIdx,
+        weightOz: w,
+        weightVal: unit === 'metric' ? Math.round(w * OZ_TO_GRAMS) : w,
+        variety: "red",
+        label: fmtWeight(w, unit)
+      }));
+      d.yellow.weights.forEach((w) => individual.push({
+        day: d.day,
+        dayIdx,
+        weightOz: w,
+        weightVal: unit === 'metric' ? Math.round(w * OZ_TO_GRAMS) : w,
+        variety: "yellow",
+        label: fmtWeight(w, unit)
+      }));
     });
 
     const redWeights = individual.filter((t) => t.variety === "red").map((t) => t.weightOz);
@@ -109,7 +168,7 @@ function useDerived() {
     const smallest = individual.reduce((a, b) => (b.weightOz < a.weightOz ? b : a));
     const bestDay = daily.reduce((a, b) => (b.totalOz > a.totalOz ? b : a));
 
-    // Build a "went uncounted by weight" sentence from whichever days have unweighed entries.
+    // Build a "went uncounted by weight" sentence
     const unweighedByVariety = { red: [], yellow: [] };
     raw.forEach((d) => {
       if (d.red.unweighed > 0) unweighedByVariety.red.push({ day: d.day, count: d.red.unweighed, note: d.red.note });
@@ -124,31 +183,45 @@ function useDerived() {
     const unweighedParts = [varietyPhrase(unweighedByVariety.red, "red"), varietyPhrase(unweighedByVariety.yellow, "yellow")].filter(Boolean);
     const unweighedSummary = unweighedParts.length ? `${unweighedParts.join(" and ")} went uncounted by weight` : null;
 
-    // Histogram buckets (2 oz wide), split by variety
-    const bucketSize = 2;
-    const maxOz = Math.max(...allWeights);
-    const numBuckets = Math.ceil(maxOz / bucketSize) + 1;
+    // Histogram buckets: 2 oz wide for imperial, 50 g wide for metric
+    const isMetric = unit === 'metric';
+    const bucketSize = isMetric ? 50 : 2; // g or oz
+    const weightsForHist = individual.map((t) => ({
+      val: isMetric ? t.weightOz * OZ_TO_GRAMS : t.weightOz,
+      variety: t.variety
+    }));
+    const maxVal = Math.max(...weightsForHist.map((w) => w.val));
+    const numBuckets = Math.ceil(maxVal / bucketSize) + 1;
+    
     const histogram = Array.from({ length: numBuckets }, (_, i) => ({
       range: `${i * bucketSize}-${i * bucketSize + bucketSize}`,
       lo: i * bucketSize,
       red: 0,
       yellow: 0,
     }));
-    redWeights.forEach((w) => { histogram[Math.min(Math.floor(w / bucketSize), numBuckets - 1)].red += 1; });
-    yellowWeights.forEach((w) => { histogram[Math.min(Math.floor(w / bucketSize), numBuckets - 1)].yellow += 1; });
+
+    weightsForHist.forEach((w) => {
+      const idx = Math.min(Math.floor(w.val / bucketSize), numBuckets - 1);
+      histogram[idx][w.variety] += 1;
+    });
+
+    const avgOz = totalOz / allWeights.length;
+    const avgHistVal = isMetric ? avgOz * OZ_TO_GRAMS : avgOz;
 
     return {
       daily,
       individual,
-      totalLb: Math.round((totalOz / 16) * 100) / 100,
-      redTotalLb: Math.round((redTotalOz / 16) * 100) / 100,
-      yellowTotalLb: Math.round((yellowTotalOz / 16) * 100) / 100,
+      totalWeightFormatted: fmtLbOrKg(totalOz, unit),
+      redTotalWeightFormatted: fmtLbOrKg(redTotalOz, unit),
+      yellowTotalWeightFormatted: fmtLbOrKg(yellowTotalOz, unit),
       totalCount, redCount, yellowCount,
       biggest, smallest, bestDay, unweighedSummary,
       histogram,
-      avgOz: Math.round((totalOz / allWeights.length) * 10) / 10,
+      avgOz,
+      avgHistVal,
+      bucketSize
     };
-  }, []);
+  }, [unit]);
 }
 
 // ---------- Small components ----------
@@ -214,8 +287,17 @@ function VarietyLegend() {
 }
 
 function TomatoHarvest() {
-  const { daily, individual, totalLb, redTotalLb, yellowTotalLb, totalCount, redCount, yellowCount, biggest, smallest, bestDay, unweighedSummary, histogram, avgOz } = useDerived();
+  const [unit, setUnit] = useState("imperial"); // "imperial" | "metric"
+  const {
+    daily, individual, totalWeightFormatted, redTotalWeightFormatted, yellowTotalWeightFormatted,
+    totalCount, redCount, yellowCount, biggest, smallest, bestDay, unweighedSummary, histogram,
+    avgOz, avgHistVal, bucketSize
+  } = useDerived(unit);
+  
   const [tab, setTab] = useState("daily");
+
+  const weightUnitLabel = unit === "metric" ? "kg" : "lb";
+  const singleUnitLabel = unit === "metric" ? "g" : "oz";
 
   return (
     <div style={{
@@ -231,16 +313,46 @@ function TomatoHarvest() {
         <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 34, margin: "6px 0 4px", color: COLORS.paper }}>
           The Tomato Harvest
         </h1>
-        <div style={{ fontFamily: "'Public Sans', sans-serif", fontSize: 13, color: COLORS.vine }}>
+        <div style={{ fontFamily: "'Public Sans', sans-serif", fontSize: 13, color: COLORS.vine, marginBottom: 12 }}>
           {raw[0].day.replace("≤ ", "")} &mdash; {raw[raw.length - 1].day} &nbsp;·&nbsp; {totalCount} tomatoes picked ({redCount} red, {yellowCount} yellow)
+        </div>
+
+        {/* Unit Conversion Toggle */}
+        <div style={{ display: "inline-flex", background: COLORS.forestDeep, padding: 3, borderRadius: 20, border: `1px solid ${COLORS.vineDim}` }}>
+          <button
+            onClick={() => setUnit("imperial")}
+            style={{
+              fontFamily: "'IBM Plex Mono', monospace", fontSize: 11,
+              padding: "4px 12px", borderRadius: 16, border: "none", cursor: "pointer",
+              background: unit === "imperial" ? COLORS.yellow : "transparent",
+              color: unit === "imperial" ? COLORS.forestDeep : COLORS.paper,
+              fontWeight: unit === "imperial" ? 600 : 400,
+              transition: "all 0.15s ease",
+            }}
+          >
+            oz / lb
+          </button>
+          <button
+            onClick={() => setUnit("metric")}
+            style={{
+              fontFamily: "'IBM Plex Mono', monospace", fontSize: 11,
+              padding: "4px 12px", borderRadius: 16, border: "none", cursor: "pointer",
+              background: unit === "metric" ? COLORS.yellow : "transparent",
+              color: unit === "metric" ? COLORS.forestDeep : COLORS.paper,
+              fontWeight: unit === "metric" ? 600 : 400,
+              transition: "all 0.15s ease",
+            }}
+          >
+            g / kg
+          </button>
         </div>
       </div>
 
       <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 26 }}>
-        <StatChip label="Total Harvest" value={`${totalLb} lb`} accent={COLORS.red} />
-        <StatChip label="Red / Yellow" value={`${redTotalLb} / ${yellowTotalLb} lb`} />
-        <StatChip label="Avg Weight" value={fmtLbOz(avgOz)} />
-        <StatChip label="Biggest" value={biggest.label} accent={biggest.variety === "red" ? COLORS.red : COLORS.yellow} />
+        <StatChip label="Total Harvest" value={totalWeightFormatted} accent={COLORS.red} />
+        <StatChip label="Red / Yellow" value={`${redTotalWeightFormatted} / ${yellowTotalWeightFormatted}`} />
+        <StatChip label="Avg Weight" value={fmtWeight(avgOz, unit)} />
+        <StatChip label="Biggest" value={fmtWeight(biggest.weightOz, unit)} accent={biggest.variety === "red" ? COLORS.red : COLORS.yellow} />
         <StatChip label="Best Day" value={bestDay.day} accent={COLORS.red} />
       </div>
 
@@ -271,25 +383,25 @@ function TomatoHarvest() {
       }}>
         {tab === "daily" && (
           <>
-            <PanelTitle title="Pounds picked, by day" sub="Red and yellow stacked to show each day's full pick" />
+            <PanelTitle title={`${unit === "metric" ? "Kilograms" : "Pounds"} picked, by day`} sub="Red and yellow stacked to show each day's full pick" />
             <VarietyLegend />
             <ResponsiveContainer width="100%" height={330}>
               <BarChart data={daily} margin={{ top: 20, right: 20, left: 0, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={COLORS.paperDim} />
                 <XAxis dataKey="day" tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} />
-                <YAxis tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} label={{ value: "lb", position: "insideTopLeft", fill: COLORS.ink }} />
+                <YAxis tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} label={{ value: weightUnitLabel, position: "insideTopLeft", fill: COLORS.ink }} />
                 <Tooltip content={<CustomTooltip formatter={(payload) => {
                   const p = payload[0].payload;
                   return (
                     <>
-                      <div>red: {p.redLb} lb ({p.redCount})</div>
-                      <div>yellow: {p.yellowLb} lb ({p.yellowCount})</div>
-                      <div style={{ marginTop: 2, color: COLORS.paper }}>total: {p.totalLb} lb</div>
+                      <div>red: {p.redVal} {weightUnitLabel} ({p.redCount})</div>
+                      <div>yellow: {p.yellowVal} {weightUnitLabel} ({p.yellowCount})</div>
+                      <div style={{ marginTop: 2, color: COLORS.paper }}>total: {p.totalVal} {weightUnitLabel}</div>
                     </>
                   );
                 }} />} />
-                <Bar dataKey="redLb" stackId="v" fill={COLORS.red} radius={[0, 0, 3, 3]} maxBarSize={44} />
-                <Bar dataKey="yellowLb" stackId="v" fill={COLORS.yellow} radius={[3, 3, 0, 0]} maxBarSize={44} />
+                <Bar dataKey="redVal" stackId="v" fill={COLORS.red} radius={[0, 0, 3, 3]} maxBarSize={44} />
+                <Bar dataKey="yellowVal" stackId="v" fill={COLORS.yellow} radius={[3, 3, 0, 0]} maxBarSize={44} />
               </BarChart>
             </ResponsiveContainer>
           </>
@@ -297,25 +409,25 @@ function TomatoHarvest() {
 
         {tab === "cumulative" && (
           <>
-            <PanelTitle title="Running total across the season" sub={`${totalLb} lb combined · ${redTotalLb} lb red, ${yellowTotalLb} lb yellow`} />
+            <PanelTitle title="Running total across the season" sub={`${totalWeightFormatted} combined · ${redTotalWeightFormatted} red, ${yellowTotalWeightFormatted} yellow`} />
             <VarietyLegend />
             <ResponsiveContainer width="100%" height={330}>
               <AreaChart data={daily} margin={{ top: 20, right: 24, left: 0, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={COLORS.paperDim} />
                 <XAxis dataKey="day" tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} />
-                <YAxis tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} label={{ value: "lb", position: "insideTopLeft", fill: COLORS.ink }} />
+                <YAxis tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} label={{ value: weightUnitLabel, position: "insideTopLeft", fill: COLORS.ink }} />
                 <Tooltip content={<CustomTooltip formatter={(payload) => {
                   const p = payload[0].payload;
                   return (
                     <>
-                      <div>red: {p.cumulativeRedLb} lb</div>
-                      <div>yellow: {p.cumulativeYellowLb} lb</div>
-                      <div style={{ marginTop: 2 }}>total: {p.cumulativeTotalLb} lb</div>
+                      <div>red: {p.cumRedVal} {weightUnitLabel}</div>
+                      <div>yellow: {p.cumYellowVal} {weightUnitLabel}</div>
+                      <div style={{ marginTop: 2 }}>total: {p.cumTotalVal} {weightUnitLabel}</div>
                     </>
                   );
                 }} />} />
-                <Area type="monotone" dataKey="cumulativeRedLb" stackId="c" stroke={COLORS.red} fill={COLORS.red} fillOpacity={0.75} strokeWidth={2} />
-                <Area type="monotone" dataKey="cumulativeYellowLb" stackId="c" stroke={COLORS.yellow} fill={COLORS.yellow} fillOpacity={0.75} strokeWidth={2} />
+                <Area type="monotone" dataKey="cumRedVal" stackId="c" stroke={COLORS.red} fill={COLORS.red} fillOpacity={0.75} strokeWidth={2} />
+                <Area type="monotone" dataKey="cumYellowVal" stackId="c" stroke={COLORS.yellow} fill={COLORS.yellow} fillOpacity={0.75} strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </>
@@ -335,9 +447,9 @@ function TomatoHarvest() {
                   tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }}
                 />
                 <YAxis
-                  type="number" dataKey="weightOz" name="weight" unit=" oz"
+                  type="number" dataKey="weightVal" name="weight" unit={` ${singleUnitLabel}`}
                   tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }}
-                  label={{ value: "oz", position: "insideTopLeft", fill: COLORS.ink }}
+                  label={{ value: singleUnitLabel, position: "insideTopLeft", fill: COLORS.ink }}
                 />
                 <Tooltip
                   cursor={{ strokeDasharray: "3 3" }}
@@ -355,12 +467,12 @@ function TomatoHarvest() {
 
         {tab === "histogram" && (
           <>
-            <PanelTitle title="How big were they, overall?" sub="Stacked by variety, 2 oz buckets" />
+            <PanelTitle title="How big were they, overall?" sub={`Stacked by variety, ${bucketSize} ${singleUnitLabel} buckets`} />
             <VarietyLegend />
             <ResponsiveContainer width="100%" height={330}>
               <BarChart data={histogram} margin={{ top: 20, right: 20, left: 0, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={COLORS.paperDim} />
-                <XAxis dataKey="range" tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 10 }} label={{ value: "oz", position: "insideBottom", offset: -4, fill: COLORS.ink }} />
+                <XAxis dataKey="range" tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 10 }} label={{ value: singleUnitLabel, position: "insideBottom", offset: -4, fill: COLORS.ink }} />
                 <YAxis tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} allowDecimals={false} />
                 <Tooltip content={<CustomTooltip formatter={(payload) => {
                   const p = payload[0].payload;
@@ -371,7 +483,7 @@ function TomatoHarvest() {
                     </>
                   );
                 }} />} />
-                <ReferenceLine x={`${Math.floor(avgOz / 2) * 2}-${Math.floor(avgOz / 2) * 2 + 2}`} stroke={COLORS.yellowBright} strokeDasharray="4 4" label={{ value: "avg", fill: COLORS.vineDim, fontSize: 10 }} />
+                <ReferenceLine x={`${Math.floor(avgHistVal / bucketSize) * bucketSize}-${Math.floor(avgHistVal / bucketSize) * bucketSize + bucketSize}`} stroke={COLORS.yellowBright} strokeDasharray="4 4" label={{ value: "avg", fill: COLORS.vineDim, fontSize: 10 }} />
                 <Bar dataKey="red" stackId="h" fill={COLORS.red} radius={[0, 0, 0, 0]} maxBarSize={40} />
                 <Bar dataKey="yellow" stackId="h" fill={COLORS.yellow} radius={[3, 3, 0, 0]} maxBarSize={40} />
               </BarChart>
@@ -381,7 +493,7 @@ function TomatoHarvest() {
       </div>
 
       <div style={{ textAlign: "center", marginTop: 16, fontSize: 11, color: COLORS.vine, fontFamily: "'IBM Plex Mono', monospace" }}>
-        smallest pick: {smallest.label} ({smallest.variety}) on {smallest.day}
+        smallest pick: {fmtWeight(smallest.weightOz, unit)} ({smallest.variety}) on {smallest.day}
         {unweighedSummary && <>&nbsp;·&nbsp; {unweighedSummary}</>}
       </div>
     </div>
