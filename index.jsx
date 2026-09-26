@@ -4,6 +4,7 @@ import {
   BarChart, Bar, AreaChart, Area, ScatterChart, Scatter,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
 } from 'recharts';
+import harvestData from './harvest_data.json';
 
 // ---------- Design tokens ----------
 const COLORS = {
@@ -20,35 +21,33 @@ const COLORS = {
   vineDim: "#4C6B4F",
 };
 
-// ---------- Raw data ----------
-// Edit this array as new harvests come in.
-const raw = [
-  { day: "≤ 7/24", red: { weights: [23.6, 19.9, 14.8, 8.9, 8.3, 8.4, 7.8, 3.6, 2.0], unweighed: 0 }, yellow: { weights: [33.2, 11.1], unweighed: 0 } },
-  { day: "7/25", red: { weights: [21.9, 17.7, 20.4], unweighed: 0 }, yellow: { weights: [26.9, 8.7], unweighed: 0 } },
-  { day: "7/26", red: { weights: [18.9, 20.3, 14.5, 7.3], unweighed: 1 }, yellow: { weights: [24.6], unweighed: 1 } },
-  { day: "7/27", red: { weights: [28.5, 17.5, 24.9, 18.1, 18.2, 23.0, 22.6, 19.8, 17.8, 14.0, 10.2], unweighed: 0 }, yellow: { weights: [8.7], unweighed: 1, note: "squirrel-eaten" } },
-  { day: "7/29", red: { weights: [18.6, 16.3, 22.7, 15.3, 16.0], unweighed: 0 }, yellow: { weights: [20.8, 11.7, 11.4], unweighed: 0 } },
-  { day: "7/31", red: { weights: [27.1, 25.5, 18.0, 17.6, 14.6, 14.5, 11.5, 10.8, 6.2], unweighed: 0 }, yellow: { weights: [18.5, 16.5], unweighed: 0 } },
-  { day: "8/2", red: { weights: [20.3, 24.4, 17.5, 16.1, 12.5], unweighed: 0 }, yellow: { weights: [26.6, 26.8, 17.9], unweighed: 0 } },
-  { day: "8/3", red: { weights: [12.7], unweighed: 0 }, yellow: { weights: [25.7], unweighed: 0 } },
-  { day: "8/6", red: { weights: [16.5, 13.2, 8.5, 8.7, 6.3], unweighed: 0 }, yellow: { weights: [15.4, 13.7, 13.3, 11.0, 29.3, 21.9], unweighed: 1, note: "1 half-eaten by squirrel" } },
-  { day: "8/12", red: { weights: [14.3], unweighed: 2, note: "rotted" }, yellow: { weights: [20.9, 18.15, 17.55, 17.05, 14.9, 13, 11.7], unweighed: 0 }},
-  { day: "8/16", red: { weights: [17.8, 16], unweighed: 0 }, yellow: { weights: [21.15, 13.10, 13.90, 13.15, 8.10, 8.15, 8.15, 3.15, 13.45], unweighed: 2, note: "rotted" }},
-  { day: "8/18", red: { weights: [], unweighed: 0 }, yellow: { weights: [17.95], unweighed: 0 }},
-  { day: "8/21", red: { weights: [], unweighed: 0 }, yellow: { weights: [13.35, 10.5], unweighed: 0 }},
-  { day: "8/23", red: { weights: [], unweighed: 0 }, yellow: { weights: [15.7], unweighed: 0 }},
-  { day: "8/27", red: { weights: [15.55], unweighed: 0 }, yellow: {weights: [], unweighed: 0 }},
-  { day: "8/30", red: { weights: [], unweighed: 0 }, yellow: { weights: [18.9, 17.55, 11.85, 12.3], unweighed: 0 }}, 
-  { day: "9/4", red: { weights: [], unweighed: 0 }, yellow: { weights: [16.65], unweighed: 0 } },
-  { day: "9/6", red: { weights: [10.25, 9.10], unweighed: 0 }, yellow: { weights: [10.55], unweighed: 0 } },
-  { day: "9/12", red: { weights: [11.25], unweighed: 0}, yellow: {weights: [16.15], unweighed: 0 } },
-  { day: "9/16", red: { weights: [20.45, 13.4, 12.9, 12.95, 10.65], unweighed: 0}, yellow: {weights: [], unweighed: 0}},
-  { day: "9/19", red: { weights: [15, 14.05, 11.3, 10.7, 10.7, 9.9, 8.95, 6.25], unweighed: 0}, yellow: { weights: [12.4, 8.3], unweighed: 0}}, 
-  { day: "9/20", red: { weights: [13.25, 13.05, 11.1, 11.15, 9.75, 9.8, 7.7, 6.85, 7.25, 5.8, 5.5], unweighed: 0}, yellow: { weights: [], unweighed: 0}},
-  { day: "9/21", red: { weights: [10.6, 9.95], unweighed: 0}, yellow: { weights: [14.4, 13.35], unweighed: 0}},
-  { day: "9/23", red: { weights: [11.15], unweighed: 0}, yellow: { weights: [], unweighed: 0} },
-  { day: "9/25", red: { weights: [10.7, 8.95, 8.9, 9.05, 7.85, 13.6], unweighed: 0}, yellow: {weights: [18.15, 14.05, 13.3, 9.45], unweighed: 0}},
-];
+// Helper: Transforms flat harvest entries into grouped daily chart data
+function formatRawData(flatLog, filterYear = 2026, filterCrop = "tomato") {
+  const filtered = flatLog.filter(item => item.year === filterYear && item.crop === filterCrop);
+  
+  const dayMap = new Map();
+
+  filtered.forEach(item => {
+    if (!dayMap.has(item.day)) {
+      dayMap.set(item.day, {
+        day: item.day,
+        red: { weights: [], unweighed: 0, note: null },
+        yellow: { weights: [], unweighed: 0, note: null }
+      });
+    }
+
+    const dayObj = dayMap.get(item.day);
+    if (dayObj[item.variety]) {
+      dayObj[item.variety].weights.push(...item.weightsOz);
+      dayObj[item.variety].unweighed += item.unweighed || 0;
+      if (item.note) dayObj[item.variety].note = item.note;
+    }
+  });
+
+  return Array.from(dayMap.values());
+}
+
+const raw = formatRawData(harvestData, 2026, "tomato");
 
 // Unit constants
 const OZ_TO_GRAMS = 28.3495;
