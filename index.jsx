@@ -47,7 +47,7 @@ const raw = [
   { day: "9/19", red: { weights: [15, 14.05, 11.3, 10.7, 10.7, 9.9, 8.95, 6.25], unweighed: 0}, yellow: { weights: [12.4, 8.3], unweighed: 0}}, 
   { day: "9/20", red: { weights: [13.25, 13.05, 11.1, 11.15, 9.75, 9.8, 7.7, 6.85, 7.25, 5.8, 5.5], unweighed: 0}, yellow: { weights: [], unweighed: 0}},
   { day: "9/21", red: { weights: [10.6, 9.95], unweighed: 0}, yellow: { weights: [14.4, 13.35], unweighed: 0}},
-  { day: "9/23", red: { weights: [11.15], unweighed: 0}, yellow: { weights: [], unweighted: 0} },
+  { day: "9/23", red: { weights: [11.15], unweighed: 0}, yellow: { weights: [], unweighed: 0} },
   { day: "9/25", red: { weights: [10.7, 8.95, 8.9, 9.05, 7.85, 13.6], unweighed: 0}, yellow: {weights: [18.15, 14.05, 13.3, 9.45], unweighed: 0}},
 ];
 
