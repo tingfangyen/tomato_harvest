@@ -334,5 +334,37 @@
     "weightsOz": [11.3, 10.95, 7.7],
     "unweighed": 0,
     "note": null
+  },
+  {
+    "date": "2026-09-27",
+    "crop": "tomato",
+    "variety": "red",
+    "weightsOz": [11.35, 4.5, 4.75, 11.2, 9.05, 8.35, 9.35, 9, 8.6, 7.6, 5.3, 4.5],
+    "unweghed": 0,
+    "note": null
+  },
+  {
+    "date": "2026-09-27",
+    "crop": "tomato",
+    "variety": "yellow",
+    "weightsOz": [15.15],
+    "unweghed": 0,
+    "note": null
+  },
+  {
+    "date": "2026-09-28",
+    "crop": "tomato",
+    "variety": "red",
+    "weightsOz": [11.1, 7.55, 7.2],
+    "unweghed": 0,
+    "note": null
+  },
+  {
+    "date": "2026-09-28",
+    "crop": "tomato",
+    "variety": "yellow",
+    "weightsOz": [6],
+    "unweghed": 0,
+    "note": null
   }
 ]
