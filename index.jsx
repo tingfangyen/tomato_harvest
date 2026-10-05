@@ -396,9 +396,9 @@ function TomatoHarvest() {
             <PanelTitle title={`${unit === "metric" ? "Kilograms" : "Pounds"} picked, by day`} sub="Red and yellow stacked to show each day's full pick" />
             <VarietyLegend />
             <ResponsiveContainer width="100%" height={330}>
-              <BarChart data={daily} margin={{ top: 20, right: 20, left: 0, bottom: 8 }}>
+              <BarChart data={daily} margin={{ top: 20, right: 20, left: 0, bottom: 35 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={COLORS.paperDim} />
-                <XAxis dataKey="day" tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} />
+                <XAxis dataKey="day" angle={-45} textAnchor="end" interval={0} tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} />
                 <YAxis tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} label={{ value: weightUnitLabel, position: "insideTopLeft", fill: COLORS.ink }} />
                 <Tooltip content={<CustomTooltip formatter={(payload) => {
                   const p = payload[0].payload;
@@ -422,9 +422,9 @@ function TomatoHarvest() {
             <PanelTitle title="Running total across the season" sub={`${totalWeightFormatted} combined · ${redTotalWeightFormatted} red, ${yellowTotalWeightFormatted} yellow`} />
             <VarietyLegend />
             <ResponsiveContainer width="100%" height={330}>
-              <AreaChart data={daily} margin={{ top: 20, right: 24, left: 0, bottom: 8 }}>
+              <AreaChart data={daily} margin={{ top: 20, right: 24, left: 0, bottom: 35 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={COLORS.paperDim} />
-                <XAxis dataKey="day" tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} />
+                <XAxis dataKey="day" angle={-45} textAnchor="end" interval={0} tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} />
                 <YAxis tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} label={{ value: weightUnitLabel, position: "insideTopLeft", fill: COLORS.ink }} />
                 <Tooltip content={<CustomTooltip formatter={(payload) => {
                   const p = payload[0].payload;
@@ -448,12 +448,15 @@ function TomatoHarvest() {
             <PanelTitle title="Every tomato, plotted by day" sub="Color shows variety; vertical spread shows size within a picking" />
             <VarietyLegend />
             <ResponsiveContainer width="100%" height={370}>
-              <ScatterChart margin={{ top: 20, right: 24, left: 0, bottom: 8 }}>
+              <ScatterChart margin={{ top: 20, right: 24, left: 0, bottom: 35 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={COLORS.paperDim} />
                 <XAxis
                   type="number" dataKey="dayIdx" domain={[-0.5, raw.length - 0.5]}
                   ticks={raw.map((_, i) => i)}
                   tickFormatter={(v) => raw[v]?.day || ""}
+                  angle={-45}
+                  textAnchor="end"
+                  interval={0}
                   tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }}
                 />
                 <YAxis
