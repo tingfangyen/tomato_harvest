@@ -21,6 +21,8 @@ const COLORS = {
   vineDim: "#4C6B4F",
 };
 
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
 // Helper: Transforms flat harvest entries into grouped daily chart data
 function formatRawData(flatLog, filterYear = 2026, filterCrop = "tomato") {
   // Sort entries chronologically by YYYY-MM-DD date
@@ -37,11 +39,13 @@ function formatRawData(flatLog, filterYear = 2026, filterCrop = "tomato") {
 
     // Convert "2026-07-24" -> "7/24" display format
     const displayDay = `${parseInt(monthStr, 10)}/${parseInt(dayStr, 10)}`;
+    const timestamp = new Date(`${item.date}T00:00:00Z`).getTime();
 
     if (!dayMap.has(displayDay)) {
       dayMap.set(displayDay, {
         day: displayDay,
         date: item.date,
+        timestamp,
         red: { weights: [], unweighed: 0, note: null },
         yellow: { weights: [], unweighed: 0, note: null }
       });
@@ -126,6 +130,7 @@ function useDerived(unit) {
 
       return {
         day: d.day,
+        timestamp: d.timestamp,
         redOz: Math.round(redTotal * 10) / 10,
         yellowOz: Math.round(yellowTotal * 10) / 10,
         redVal,
@@ -141,10 +146,10 @@ function useDerived(unit) {
     });
 
     const individual = [];
-    raw.forEach((d, dayIdx) => {
+    raw.forEach((d) => {
       d.red.weights.forEach((w) => individual.push({
         day: d.day,
-        dayIdx,
+        timestamp: d.timestamp,
         weightOz: w,
         weightVal: unit === 'metric' ? Math.round(w * OZ_TO_GRAMS) : w,
         variety: "red",
@@ -152,13 +157,18 @@ function useDerived(unit) {
       }));
       d.yellow.weights.forEach((w) => individual.push({
         day: d.day,
-        dayIdx,
+        timestamp: d.timestamp,
         weightOz: w,
         weightVal: unit === 'metric' ? Math.round(w * OZ_TO_GRAMS) : w,
         variety: "yellow",
         label: fmtWeight(w, unit)
       }));
     });
+
+    const timestamps = daily.map(d => d.timestamp);
+    const minTimestamp = Math.min(...timestamps);
+    const maxTimestamp = Math.max(...timestamps);
+    const dateDomain = [minTimestamp - ONE_DAY_MS, maxTimestamp + ONE_DAY_MS];
 
     const redWeights = individual.filter((t) => t.variety === "red").map((t) => t.weightOz);
     const yellowWeights = individual.filter((t) => t.variety === "yellow").map((t) => t.weightOz);
@@ -221,6 +231,7 @@ function useDerived(unit) {
     return {
       daily,
       individual,
+      dateDomain,
       totalWeightFormatted: fmtLbOrKg(totalOz, unit),
       redTotalWeightFormatted: fmtLbOrKg(redTotalOz, unit),
       yellowTotalWeightFormatted: fmtLbOrKg(yellowTotalOz, unit),
@@ -276,12 +287,19 @@ const TABS = [
 
 function CustomTooltip({ active, payload, label, formatter }) {
   if (!active || !payload || !payload.length) return null;
+  
+  let title = label;
+  if (typeof label === "number") {
+    const d = new Date(label);
+    title = `${d.getUTCMonth() + 1}/${d.getUTCDate()}`;
+  }
+
   return (
     <div style={{
       background: COLORS.forest, color: COLORS.paper, padding: "8px 12px",
       borderRadius: 8, border: `1px solid ${COLORS.yellow}`, fontFamily: "'IBM Plex Mono', monospace", fontSize: 12,
     }}>
-      <div style={{ marginBottom: 4, color: COLORS.yellowBright }}>{label}</div>
+      <div style={{ marginBottom: 4, color: COLORS.yellowBright }}>{title}</div>
       {formatter(payload)}
     </div>
   );
@@ -299,7 +317,7 @@ function VarietyLegend() {
 function TomatoHarvest() {
   const [unit, setUnit] = useState("imperial"); // "imperial" | "metric"
   const {
-    daily, individual, totalWeightFormatted, redTotalWeightFormatted, yellowTotalWeightFormatted,
+    daily, individual, dateDomain, totalWeightFormatted, redTotalWeightFormatted, yellowTotalWeightFormatted,
     totalCount, redCount, yellowCount, biggest, smallest, bestDay, unweighedSummary, histogram,
     avgOz, avgHistVal, bucketSize
   } = useDerived(unit);
@@ -308,6 +326,11 @@ function TomatoHarvest() {
 
   const weightUnitLabel = unit === "metric" ? "kg" : "lb";
   const singleUnitLabel = unit === "metric" ? "g" : "oz";
+
+  const formatDateTick = (ts) => {
+    const d = new Date(ts);
+    return `${d.getUTCMonth() + 1}/${d.getUTCDate()}`;
+  };
 
   return (
     <div style={{
@@ -324,7 +347,7 @@ function TomatoHarvest() {
           The Tomato Harvest
         </h1>
         <div style={{ fontFamily: "'Public Sans', sans-serif", fontSize: 13, color: COLORS.vine, marginBottom: 12 }}>
-          {raw[0].day.replace("≤ ", "")} &mdash; {raw[raw.length - 1].day} &nbsp;·&nbsp; {totalCount} tomatoes picked ({redCount} red, {yellowCount} yellow)
+          {raw[0].day} &mdash; {raw[raw.length - 1].day} &nbsp;·&nbsp; {totalCount} tomatoes picked ({redCount} red, {yellowCount} yellow)
         </div>
 
         {/* Unit Conversion Toggle */}
@@ -398,7 +421,16 @@ function TomatoHarvest() {
             <ResponsiveContainer width="100%" height={330}>
               <BarChart data={daily} margin={{ top: 20, right: 20, left: 0, bottom: 35 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={COLORS.paperDim} />
-                <XAxis dataKey="day" angle={-45} textAnchor="end" interval={0} tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} />
+                <XAxis
+                  dataKey="timestamp"
+                  type="number"
+                  scale="time"
+                  domain={dateDomain}
+                  angle={-45}
+                  textAnchor="end"
+                  tickFormatter={formatDateTick}
+                  tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }}
+                />
                 <YAxis tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} label={{ value: weightUnitLabel, position: "insideTopLeft", fill: COLORS.ink }} />
                 <Tooltip content={<CustomTooltip formatter={(payload) => {
                   const p = payload[0].payload;
@@ -410,8 +442,8 @@ function TomatoHarvest() {
                     </>
                   );
                 }} />} />
-                <Bar dataKey="redVal" stackId="v" fill={COLORS.red} radius={[0, 0, 3, 3]} maxBarSize={44} />
-                <Bar dataKey="yellowVal" stackId="v" fill={COLORS.yellow} radius={[3, 3, 0, 0]} maxBarSize={44} />
+                <Bar dataKey="redVal" stackId="v" fill={COLORS.red} radius={[0, 0, 3, 3]} barSize={12} />
+                <Bar dataKey="yellowVal" stackId="v" fill={COLORS.yellow} radius={[3, 3, 0, 0]} barSize={12} />
               </BarChart>
             </ResponsiveContainer>
           </>
@@ -424,7 +456,16 @@ function TomatoHarvest() {
             <ResponsiveContainer width="100%" height={330}>
               <AreaChart data={daily} margin={{ top: 20, right: 24, left: 0, bottom: 35 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={COLORS.paperDim} />
-                <XAxis dataKey="day" angle={-45} textAnchor="end" interval={0} tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} />
+                <XAxis
+                  dataKey="timestamp"
+                  type="number"
+                  scale="time"
+                  domain={dateDomain}
+                  angle={-45}
+                  textAnchor="end"
+                  tickFormatter={formatDateTick}
+                  tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }}
+                />
                 <YAxis tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }} label={{ value: weightUnitLabel, position: "insideTopLeft", fill: COLORS.ink }} />
                 <Tooltip content={<CustomTooltip formatter={(payload) => {
                   const p = payload[0].payload;
@@ -451,12 +492,13 @@ function TomatoHarvest() {
               <ScatterChart margin={{ top: 20, right: 24, left: 0, bottom: 35 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={COLORS.paperDim} />
                 <XAxis
-                  type="number" dataKey="dayIdx" domain={[-0.5, raw.length - 0.5]}
-                  ticks={raw.map((_, i) => i)}
-                  tickFormatter={(v) => raw[v]?.day || ""}
+                  type="number"
+                  dataKey="timestamp"
+                  scale="time"
+                  domain={dateDomain}
                   angle={-45}
                   textAnchor="end"
-                  interval={0}
+                  tickFormatter={formatDateTick}
                   tick={{ fill: COLORS.ink, fontFamily: "IBM Plex Mono", fontSize: 11 }}
                 />
                 <YAxis
