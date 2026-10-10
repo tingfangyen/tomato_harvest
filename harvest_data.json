@@ -422,5 +422,21 @@
     "weightsOz": [9.3, 6.2],
     "unweghed": 0,
     "note": null
+  },
+  {
+    "date": "2026-10-09",
+    "crop": "tomato",
+    "variety": "red",
+    "weightsOz": [12.55, 12.05, 9.55, 9.65, 8.75],
+    "unweghed": 0,
+    "note": null
+  },
+  {
+    "date": "2026-10-09",
+    "crop": "tomato",
+    "variety": "yellow",
+    "weightsOz": [15.65, 7.05],
+    "unweghed": 0,
+    "note": null
   }
 ]
